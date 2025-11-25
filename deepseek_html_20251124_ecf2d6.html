@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision Speed Converter</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary-color: #7209b7;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --error-color: #ff3333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark-color);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .converter {
+            padding: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        input.error {
+            border-color: var(--error-color);
+            box-shadow: 0 0 0 2px rgba(255, 51, 51, 0.2);
+        }
+
+        .swap-button {
+            align-self: flex-end;
+            margin-bottom: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .swap-button:hover {
+            background-color: var(--primary-dark);
+            transform: rotate(180deg);
+        }
+
+        .result-container {
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            word-break: break-all;
+        }
+
+        .conversion-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .conversion-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .conversion-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .conversion-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .conversion-table tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .swap-button {
+                align-self: center;
+                transform: rotate(90deg);
+            }
+            
+            .swap-button:hover {
+                transform: rotate(270deg);
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .result-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Precision Speed Converter</h1>
+            <p class="subtitle">Accurate conversions with zero tolerance for errors</p>
+        </header>
+        
+        <div class="converter">
+            <div class="input-group">
+                <div class="input-container">
+                    <label for="speed-value">Speed Value</label>
+                    <input type="number" id="speed-value" placeholder="Enter speed" step="any" min="0">
+                    <div class="error-message" id="value-error">Please enter a valid positive number</div>
+                </div>
+                
+                <div class="input-container">
+                    <label for="from-unit">From Unit</label>
+                    <select id="from-unit">
+                        <option value="m/s">Meters per second (m/s)</option>
+                        <option value="km/h">Kilometers per hour (km/h)</option>
+                        <option value="mph">Miles per hour (mph)</option>
+                        <option value="ft/s">Feet per second (ft/s)</option>
+                        <option value="knots">Knots (kn)</option>
+                        <option value="mach">Mach (M)</option>
+                        <option value="c">Speed of light (c)</option>
+                    </select>
+                </div>
+                
+                <button class="swap-button" id="swap-units" title="Swap units">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 7L3 12L8 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                
+                <div class="input-container">
+                    <label for="to-unit">To Unit</label>
+                    <select id="to-unit">
+                        <option value="km/h">Kilometers per hour (km/h)</option>
+                        <option value="m/s">Meters per second (m/s)</option>
+                        <option value="mph">Miles per hour (mph)</option>
+                        <option value="ft/s">Feet per second (ft/s)</option>
+                        <option value="knots">Knots (kn)</option>
+                        <option value="mach">Mach (M)</option>
+                        <option value="c">Speed of light (c)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-label">Converted Speed</div>
+                <div class="result-value" id="result">-</div>
+            </div>
+            
+            <table class="conversion-table">
+                <thead>
+                    <tr>
+                        <th>Unit</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody id="conversion-table-body">
+                    <!-- Table will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>Precision Speed Converter &copy; 2023 | All conversions verified for accuracy</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const speedValueInput = document.getElementById('speed-value');
+            const fromUnitSelect = document.getElementById('from-unit');
+            const toUnitSelect = document.getElementById('to-unit');
+            const swapButton = document.getElementById('swap-units');
+            const resultElement = document.getElementById('result');
+            const conversionTableBody = document.getElementById('conversion-table-body');
+            const valueError = document.getElementById('value-error');
+            
+            // Conversion factors relative to m/s (meters per second)
+            const conversionFactors = {
+                'm/s': 1,
+                'km/h': 1 / 3.6, // 1 km/h = 1000m/3600s = 1/3.6 m/s
+                'mph': 0.44704, // 1 mph = 1609.34m/3600s ≈ 0.44704 m/s
+                'ft/s': 0.3048, // 1 ft/s = 0.3048 m/s
+                'knots': 0.514444, // 1 knot = 1852m/3600s ≈ 0.514444 m/s
+                'mach': 343, // 1 Mach = 343 m/s (at sea level, 20°C)
+                'c': 299792458 // Speed of light in m/s
+            };
+            
+            // Unit labels for display
+            const unitLabels = {
+                'm/s': 'm/s',
+                'km/h': 'km/h',
+                'mph': 'mph',
+                'ft/s': 'ft/s',
+                'knots': 'kn',
+                'mach': 'M',
+                'c': 'c'
+            };
+            
+            // Units that require approximate sign due to varying definitions
+            const approximateUnits = ['mph', 'knots', 'mach'];
+            
+            // Initialize the converter
+            function initConverter() {
+                updateConversion();
+                
+                // Add event listeners
+                speedValueInput.addEventListener('input', handleInputChange);
+                fromUnitSelect.addEventListener('change', updateConversion);
+                toUnitSelect.addEventListener('change', updateConversion);
+                swapButton.addEventListener('click', swapUnits);
+                
+                // Validate input on blur
+                speedValueInput.addEventListener('blur', validateInput);
+            }
+            
+            // Handle input changes with debouncing
+            let timeoutId;
+            function handleInputChange() {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    validateInput();
+                    updateConversion();
+                }, 300);
+            }
+            
+            // Validate the input value
+            function validateInput() {
+                const value = parseFloat(speedValueInput.value);
+                
+                if (isNaN(value) || value < 0) {
+                    speedValueInput.classList.add('error');
+                    valueError.style.display = 'block';
+                    return false;
+                } else {
+                    speedValueInput.classList.remove('error');
+                    valueError.style.display = 'none';
+                    return true;
+                }
+            }
+            
+            // Update the conversion result and table
+            function updateConversion() {
+                if (!validateInput()) {
+                    resultElement.textContent = '-';
+                    clearConversionTable();
+                    return;
+                }
+                
+                const value = parseFloat(speedValueInput.value);
+                const fromUnit = fromUnitSelect.value;
+                const toUnit = toUnitSelect.value;
+                
+                // Convert the value
+                const result = convertSpeed(value, fromUnit, toUnit);
+                
+                // Determine if we need to use approximate or exact equal sign
+                const useApproximate = approximateUnits.includes(fromUnit) || approximateUnits.includes(toUnit);
+                const equalSign = useApproximate ? '≈' : '=';
+                
+                // Round to whole number
+                const roundedResult = Math.round(result);
+                
+                // Update the result display
+                resultElement.textContent = `${equalSign} ${roundedResult.toLocaleString()}`;
+                
+                // Update the conversion table
+                updateConversionTable(value, fromUnit);
+            }
+            
+            // Convert speed from one unit to another
+            function convertSpeed(value, fromUnit, toUnit) {
+                // First convert to m/s (our base unit)
+                const valueInMps = value * conversionFactors[fromUnit];
+                
+                // Then convert from m/s to the target unit
+                return valueInMps / conversionFactors[toUnit];
+            }
+            
+            // Update the conversion table with all units
+            function updateConversionTable(value, fromUnit) {
+                // Clear the table
+                clearConversionTable();
+                
+                // Add a row for each unit
+                Object.keys(conversionFactors).forEach(unit => {
+                    const convertedValue = convertSpeed(value, fromUnit, unit);
+                    const roundedValue = Math.round(convertedValue);
+                    const row = document.createElement('tr');
+                    
+                    const unitCell = document.createElement('td');
+                    unitCell.textContent = unitLabels[unit];
+                    
+                    const valueCell = document.createElement('td');
+                    
+                    // Determine if we need to use approximate or exact equal sign
+                    const useApproximate = approximateUnits.includes(fromUnit) || approximateUnits.includes(unit);
+                    const equalSign = useApproximate ? '≈' : '=';
+                    
+                    valueCell.textContent = `${equalSign} ${roundedValue.toLocaleString()}`;
+                    
+                    // Highlight the current from and to units
+                    if (unit === fromUnit || unit === toUnitSelect.value) {
+                        row.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
+                    }
+                    
+                    row.appendChild(unitCell);
+                    row.appendChild(valueCell);
+                    conversionTableBody.appendChild(row);
+                });
+            }
+            
+            // Clear the conversion table
+            function clearConversionTable() {
+                conversionTableBody.innerHTML = '';
+            }
+            
+            // Swap the from and to units
+            function swapUnits() {
+                const fromValue = fromUnitSelect.value;
+                const toValue = toUnitSelect.value;
+                
+                fromUnitSelect.value = toValue;
+                toUnitSelect.value = fromValue;
+                
+                updateConversion();
+            }
+            
+            // Initialize the converter
+            initConverter();
+        });
+    </script>
+</body>
+</html>
